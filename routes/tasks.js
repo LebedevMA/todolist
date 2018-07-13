@@ -4,7 +4,21 @@ var ObjectID = require('mongodb').ObjectID;
 module.exports = function(app, db) {
 	// Список задач
 	app.get('/tasks', (req, res) => {
-		db.collection('tasks').find((err, cursor) => {
+		if (req.session.user === undefined){
+			res.send({'error' : 'Login required'});
+			return;
+		}
+		var details;
+		switch(req.session.user.role){
+		case 'admin':
+			details = { };
+			break;
+		case 'user':
+			details = { 'user' : new ObjectID(req.session.user.id) };
+			break;
+		}
+		
+		db.collection('tasks').find(details, (err, cursor) => {
 			if (err) {
 				res.send({'error':'An error has occurred'});
 			} else {
@@ -20,7 +34,19 @@ module.exports = function(app, db) {
 	});
 	// Фильтрация по приоритету
 	app.get('/tasks/priority/:priority', (req, res) => {
-		var details = { 'priority' : parseInt(req.params.priority, 10) };
+		if (req.session.user === undefined){
+			res.send({'error' : 'Login required'});
+			return;
+		}
+		var details;
+		switch(req.session.user.role){
+		case 'admin':
+			details = { 'priority' : parseInt(req.params.priority, 10) };
+			break;
+		case 'user':
+			details = { 'priority' : parseInt(req.params.priority, 10), 'user' : new ObjectID(req.session.user.id) };
+			break;
+		}
 		
 		db.collection('tasks').find(details, (err, cursor) => {
 			if (err) {
@@ -38,11 +64,23 @@ module.exports = function(app, db) {
 	});
 	// Фильтрация по статусу выполнения
 	app.get('/tasks/completed/:completed', (req, res) => {
+		if (req.session.user === undefined){
+			res.send({'error' : 'Login required'});
+			return;
+		}
 		var completed;
 		if (req.params.completed == "true") completed = true;
 		if (req.params.completed == "false") completed = false;
 		
-		var details = { 'completed' : completed };
+		var details;
+		switch(req.session.user.role){
+		case 'admin':
+			details = { 'completed' : completed };
+			break;
+		case 'user':
+			details = { 'completed' : completed, 'user' : new ObjectID(req.session.user.id) };
+			break;
+		}
 		
 		db.collection('tasks').find(details, (err, cursor) => {
 			if (err) {
@@ -60,9 +98,22 @@ module.exports = function(app, db) {
 	});
 	// Отдельная задача
 	app.get('/tasks/:id', (req, res) => {
+		if (req.session.user === undefined){
+			res.send({'error' : 'Login required'});
+			return;
+		}
 		var id = req.params.id;
 		
-		var details = { '_id': new ObjectID(id) };
+		var details;
+		
+		switch(req.session.user.role){
+		case 'admin':
+			details = { '_id': new ObjectID(id) };
+			break;
+		case 'user':
+			details = { '_id': new ObjectID(id), 'user' : new ObjectID(req.session.user.id) };
+			break;
+		}
 		
 		db.collection('tasks').findOne(details, (err, item) => {
 			if (err) {
@@ -74,6 +125,10 @@ module.exports = function(app, db) {
 	});
 	// Добавление задачи
 	app.post('/tasks', (req, res) => {
+		if (req.session.user === undefined){
+			res.send({'error' : 'Login required'});
+			return;
+		}
 		var task_text = "";
 		if (req.body.text !== undefined) task_text = req.body.text;
 		var task_priority = 0;
@@ -81,7 +136,7 @@ module.exports = function(app, db) {
 		var task_completed;
 		if (req.body.completed == "true") task_completed = true;
 		if (req.body.completed == "false") task_completed = false;
-		var task = { text: task_text, priority: task_priority, completed: task_completed };
+		var task = { text: task_text, priority: task_priority, completed: task_completed, user: new ObjectID(req.session.user.id) };
 		
 		db.collection('tasks').insert(task, (err, result) => {
 			if (err) { 
@@ -93,9 +148,21 @@ module.exports = function(app, db) {
 	});
 	// Удаление задачи
 	app.delete('/tasks/:id', (req, res) => {
+		if (req.session.user === undefined){
+			res.send({'error' : 'Login required'});
+			return;
+		}
 		var id = req.params.id;
-		var details = { '_id': new ObjectID(id) };
+		var details;
 		
+		switch(req.session.user.role){
+		case 'admin':
+			details = { '_id': new ObjectID(id) };
+			break;
+		case 'user':
+			details = { '_id': new ObjectID(id), 'user' : new ObjectID(req.session.user.id) };
+			break;
+		}
 		db.collection('tasks').remove(details, (err, item) => {
 			if (err) {
 				res.send({'error':'An error has occurred'});
@@ -106,9 +173,20 @@ module.exports = function(app, db) {
 	});
 	// Изменение задачи
 	app.put ('/tasks/:id', (req, res) => {
-		var id = req.params.id;
+		if (req.session.user === undefined){
+			res.send({'error' : 'Login required'});
+			return;
+		}
+		var id = req.params.id;var details;
 		
-		var details = { '_id': new ObjectID(id) };
+		switch(req.session.user.role){
+		case 'admin':
+			details = { '_id': new ObjectID(id) };
+			break;
+		case 'user':
+			details = { '_id': new ObjectID(id), 'user' : new ObjectID(req.session.user.id) };
+			break;
+		}
 		
 		var task_fields = {};
 		if (req.body.text !== undefined) task_fields.text = req.body.text;
