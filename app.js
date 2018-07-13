@@ -8,6 +8,8 @@ var MongoStore = require('connect-mongo')(session);
 
 app.use(bodyParser.json());
 
+app.use(express.static(__dirname + '/public'));
+
 app.use(session({
   secret: 'nbgjfhdfgffhgjhgkfjg',
   resave: false,
@@ -16,6 +18,9 @@ app.use(session({
     url: 'mongodb://localhost:27017/todolist',
   })
 }))
+
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
 
 MongoClient.connect('mongodb://localhost:27017/', {useNewUrlParser: true}, (err, database) => {
   if (err) return console.log(err)

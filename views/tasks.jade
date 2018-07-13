@@ -1,0 +1,60 @@
+script(src="/jquery.min.js")
+p Username: #{user.username}
+p Role: #{user.role}
+form(action='/users/logout',method='post')
+	input(type='submit',value='logout')
+
+h1 New task
+form(method='post', action='/tasks', id='taskCreateForm')
+	| Text: 
+	input(type='text', name='text')
+	| Priority: 
+	select(name='priority')
+		- priorities = [ 0, 1, 2, 3, 4]
+		for item in priorities
+			if item == 0
+				option(selected="true",value="#{item}") #{item}
+			else
+				option(value="#{item}") #{item}
+	input(type='submit',value='create')
+h1 Filter
+a(href="/tasks") None
+p By priority 
+	- priorities = [ 0, 1, 2, 3, 4]
+	for item in priorities
+		a(href="/tasks/priority/#{item}") #{item}
+		|  
+p By status 
+	a(href="/tasks/completed/true") completed 
+	|  
+	a(href="/tasks/completed/false") uncompleted 
+h1 Tasks list
+if (tasks.length === 0)
+	p No tasks.
+for task in tasks
+	div
+		form(method='post', action='/tasks/#{task._id}',style='display:inline-block', class='taskUpdateForm')
+			a(href="/tasks/#{task._id}") #
+			| &nbsp;
+			| Text: 
+			input(type='text', name='text', value='#{task.text}')
+			| Priority: 
+			select(name='priority')
+				- priorities = [ 0, 1, 2, 3, 4]
+				for item in priorities
+					if task.priority == item
+						option(selected="true",value="#{item}") #{item}
+					else
+						option(value="#{item}") #{item}
+			| Completed: 
+			select(name='completed')
+				if task.completed == true
+					option(selected="true",value="true") yes
+					option(value="false") no
+				else
+					option(value="true") yes
+					option(selected="true",value="false") no
+			input(type='submit',value='update')
+		form(method='post', action='/tasks/#{task._id}',style='display:inline-block', class='taskDeleteForm')
+			input(type='submit',value='delete')
+script(src="/tasks.js")

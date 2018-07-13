@@ -1,0 +1,16 @@
+script(src="/jquery.min.js")
+h1 Register
+form(method='post', action='/users/register', id='registerForm')
+	| Username: 
+	input(type='text', name='username')
+	| Password: 
+	input(type='password', name='password')
+	input(type='submit',value='register')
+h1 Login
+form(method='post', action='/users/login', id='loginForm')
+	| Username: 
+	input(type='text', name='username')
+	| Password: 
+	input(type='password', name='password')
+	input(type='submit',value='login')
+script(src="/login.js")

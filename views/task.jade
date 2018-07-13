@@ -1,0 +1,24 @@
+script(src="/jquery.min.js")
+form(method='post', action='/tasks/#{task._id}',style='display:inline-block',class='taskUpdateForm')
+	div Text: 
+		input(type='text', name='text', value='#{task.text}')
+	div Priority: 
+		select(name='priority')
+			- priorities = [ 0, 1, 2, 3, 4]
+			for item in priorities
+				if task.priority == item
+					option(selected="true",value="#{item}") #{item}
+				else
+					option(value="#{item}") #{item}
+	div Completed: 
+		select(name='completed')
+			if task.completed == true
+				option(selected="true",value="true") yes
+				option(value="false") no
+			else
+				option(value="true") yes
+				option(selected="true",value="false") no
+	input(type='submit',value='update')
+form(method='post', action='/tasks/#{task._id}',style='display:inline-block',class='taskDeleteForm')
+	input(type='submit',value='delete')
+script(src="/tasks.js")

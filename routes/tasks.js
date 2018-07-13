@@ -5,7 +5,7 @@ module.exports = function(app, db) {
 	// Список задач
 	app.get('/tasks', (req, res) => {
 		if (req.session.user === undefined){
-			res.send({'error' : 'Login required'});
+			res.redirect('/users/login');
 			return;
 		}
 		var details;
@@ -20,13 +20,13 @@ module.exports = function(app, db) {
 		
 		db.collection('tasks').find(details, (err, cursor) => {
 			if (err) {
-				res.send({'error':'An error has occurred'});
+				res.render('error', {'error':'An error has occurred'});
 			} else {
 				cursor.toArray((err, result) => {
 					if (err) {
-						res.send({'error':'An error has occurred'});
+						res.render('error', {'error':'An error has occurred'});
 					} else {
-						res.send(result);
+						res.render('tasks', {'tasks' : result, 'user' : req.session.user});
 					} 
 				})
 			} 
@@ -35,7 +35,7 @@ module.exports = function(app, db) {
 	// Фильтрация по приоритету
 	app.get('/tasks/priority/:priority', (req, res) => {
 		if (req.session.user === undefined){
-			res.send({'error' : 'Login required'});
+			res.redirect('/users/login');
 			return;
 		}
 		var details;
@@ -50,13 +50,13 @@ module.exports = function(app, db) {
 		
 		db.collection('tasks').find(details, (err, cursor) => {
 			if (err) {
-				res.send({'error':'An error has occurred'});
+				res.render('error', {'error':'An error has occurred'});
 			} else {
 				cursor.toArray((err, result) => {
 					if (err) {
-						res.send({'error':'An error has occurred'});
+						res.render('error', {'error':'An error has occurred'});
 					} else {
-						res.send(result);
+						res.render('tasks', {'tasks' : result, 'user' : req.session.user});
 					} 
 				})
 			} 
@@ -65,9 +65,10 @@ module.exports = function(app, db) {
 	// Фильтрация по статусу выполнения
 	app.get('/tasks/completed/:completed', (req, res) => {
 		if (req.session.user === undefined){
-			res.send({'error' : 'Login required'});
+			res.redirect('/users/login');
 			return;
 		}
+		
 		var completed;
 		if (req.params.completed == "true") completed = true;
 		if (req.params.completed == "false") completed = false;
@@ -84,13 +85,13 @@ module.exports = function(app, db) {
 		
 		db.collection('tasks').find(details, (err, cursor) => {
 			if (err) {
-				res.send({'error':'An error has occurred'});
+				res.render('error', {'error':'An error has occurred'});
 			} else {
 				cursor.toArray((err, result) => {
 					if (err) {
-						res.send({'error':'An error has occurred'});
+						res.render('error', {'error':'An error has occurred'});
 					} else {
-						res.send(result);
+						res.render('tasks', {'tasks' : result, 'user' : req.session.user});
 					} 
 				})
 			} 
@@ -99,7 +100,7 @@ module.exports = function(app, db) {
 	// Отдельная задача
 	app.get('/tasks/:id', (req, res) => {
 		if (req.session.user === undefined){
-			res.send({'error' : 'Login required'});
+			res.redirect('/users/login');
 			return;
 		}
 		var id = req.params.id;
@@ -117,16 +118,16 @@ module.exports = function(app, db) {
 		
 		db.collection('tasks').findOne(details, (err, item) => {
 			if (err) {
-				res.send({'error':'An error has occurred'});
+				res.render('error', {'error':'An error has occurred'});
 			} else {
-				res.send(item);
+				res.render('task', {'task' : item});
 			} 
 		});
 	});
 	// Добавление задачи
 	app.post('/tasks', (req, res) => {
 		if (req.session.user === undefined){
-			res.send({'error' : 'Login required'});
+			res.redirect('/users/login');
 			return;
 		}
 		var task_text = "";
@@ -149,7 +150,7 @@ module.exports = function(app, db) {
 	// Удаление задачи
 	app.delete('/tasks/:id', (req, res) => {
 		if (req.session.user === undefined){
-			res.send({'error' : 'Login required'});
+			res.redirect('/users/login');
 			return;
 		}
 		var id = req.params.id;
@@ -174,7 +175,7 @@ module.exports = function(app, db) {
 	// Изменение задачи
 	app.put ('/tasks/:id', (req, res) => {
 		if (req.session.user === undefined){
-			res.send({'error' : 'Login required'});
+			res.redirect('/users/login');
 			return;
 		}
 		var id = req.params.id;var details;

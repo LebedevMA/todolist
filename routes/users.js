@@ -30,9 +30,14 @@ module.exports = function(app, db) {
 			res.send({'error':'Bad username or password'});
 		}
 	});
+	// Страница входа и регистрации
+	app.get('/users/login', function(req, res) {
+		if (req.session.user) return res.redirect('/')
+		res.status(401).render('login');
+	});
 	// Авторизация пользователя
 	app.post('/users/login', function(req, res) {
-		if (req.session.user) return res.redirect('/tasks')
+		if (req.session.user) return res.redirect('/')
 		var details = { 'username': req.body.username, 'password' : req.body.password};
 		db.collection('users').findOne(details, (err, item) => {
 			if (err) {
@@ -51,6 +56,7 @@ module.exports = function(app, db) {
 	app.post('/users/logout', function(req, res) {
 		if (req.session.user) {
 			delete req.session.user;
+			res.redirect('/')
 		}
 	});
 };

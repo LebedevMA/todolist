@@ -13,6 +13,8 @@
     "connect-mongo": "^2.0.1",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
+    "jade": "^1.11.0",
+    "method-override": "^2.3.10",
     "mongodb": "^3.1.1"
   }
 }
